@@ -9,6 +9,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -16,6 +19,21 @@ public class FoodController {
 
     @Autowired
     private FoodRepository foodRepository;
+
+    public static Date convertToDate(LocalDate dateToConvert)
+    {
+        return java.sql.Date.valueOf(dateToConvert);
+    }
+
+    @GetMapping("/getweeklymenu")
+    public List<Food> getWeeklyMenu() {
+//        LocalDate localDateNow = LocalDate.of(2020, 02, 27);
+        LocalDate localDateNow = LocalDate.now();
+        Date startDate = convertToDate(localDateNow.with(DayOfWeek.MONDAY));
+        Date endDate = convertToDate(localDateNow.with(DayOfWeek.FRIDAY));
+        List<Food> result = foodRepository.findByFoodDateBetween(startDate, endDate);
+        return result;
+    }
 
     @GetMapping("/getfoods")
     public List<Food> getFoodList() {
